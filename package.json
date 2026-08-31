@@ -1,5 +1,5 @@
 {
-  "name": "meith-board",
+  "name": "gdg.ie",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -7,13 +7,13 @@
     "dev": "forum-web dev",
     "build": "forum-web build",
     "start": "forum-web start",
-    "community": "community"
+    "meith": "meith"
   },
   "dependencies": {
-    "@meith/web": "0.26.1",
-    "@meith/cli": "0.26.1",
-    "@meith/plugin-calendar": "0.26.1",
-    "@meith/theme-default": "0.26.1",
+    "@meith/web": "0.27.0",
+    "@meith/cli": "0.27.0",
+    "@meith/plugin-calendar": "0.27.0",
+    "@meith/theme-default": "0.27.0",
     "next": "16.3.1"
   },
   "engines": {

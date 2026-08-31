@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1.7-labs
 # check=skip=InvalidDefaultArgInFrom
-# meith-board's quick-start deploy image — built from source, with nothing to
+# gdg.ie's quick-start deploy image — built from source, with nothing to
 # set up first.
 #
 # FROM node:26-alpine directly rather than a published Meith base image:
@@ -15,8 +15,8 @@
 # "Custom boards").
 #
 # Two stages, not three: unlike the official image, this does not prune down
-# to Next's own standalone output. The migrate role below runs `community
-# migrate`, and `community` materializes @meith/cli's sources and runs them
+# to Next's own standalone output. The migrate role below runs `meith
+# migrate`, and `meith` materializes @meith/cli's sources and runs them
 # with tsx at the moment it runs (see the meith repository's
 # docs/contributing/development.md, "Consuming the board from a workspace") — it needs
 # the full, un-pruned node_modules tree this board installed, not what Next

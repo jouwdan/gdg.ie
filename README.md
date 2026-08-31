@@ -1,4 +1,4 @@
-# meith-board
+# gdg.ie
 
 A forum, built on [Meith](https://github.com/meith-dev/meith).
 
@@ -52,7 +52,7 @@ one. Three steps, nothing to configure by hand beyond one value only you know:
 
 1. **Push this repository to GitHub.** `.github/workflows/build.yml` builds
    `Dockerfile.prebuilt` on every push to `main` and pushes the result to your
-   own GitHub Container Registry, `ghcr.io/<you>/meith-board` — using only the
+   own GitHub Container Registry, `ghcr.io/<you>/gdg.ie` — using only the
    `GITHUB_TOKEN` every GitHub Actions run already carries. No secret to
    add, no registry account beyond the GitHub account you already have.
 
@@ -73,8 +73,8 @@ one. Three steps, nothing to configure by hand beyond one value only you know:
    cannot generate is the image step 1 just pushed: set `MEITH_IMAGE` in the
    resource's own environment to one of the two values that run's Summary
    printed (`docker-compose.prebuilt.yaml` refuses to start without it, with
-   a message saying why). `ghcr.io/<you>/meith-board:${{ github.sha }}` names
-   that one build and nothing else, ever; `ghcr.io/<you>/meith-board:latest`
+   a message saying why). `ghcr.io/<you>/gdg.ie:${{ github.sha }}` names
+   that one build and nothing else, ever; `ghcr.io/<you>/gdg.ie:latest`
    follows `main` instead, so installing a plugin later is a push and a
    **Redeploy** — the trade this path takes, at the cost of an unrelated
    redeploy pulling whatever `main` most recently built.
@@ -93,7 +93,7 @@ rather not use GitHub Actions for the build — push the result wherever
 `docker-compose.prebuilt.yaml`'s `MEITH_IMAGE` can reach.
 
 ```sh
-docker build -f Dockerfile.prebuilt --build-arg MEITH_VERSION=$(node -p "require('./package.json').dependencies['@meith/web']") -t meith-board .
+docker build -f Dockerfile.prebuilt --build-arg MEITH_VERSION=$(node -p "require('./package.json').dependencies['@meith/web']") -t gdg.ie .
 ```
 
 **Without a panel**: [docs/getting-started/deployment/docker-compose.md](https://github.com/meith-dev/meith/blob/main/docs/getting-started/deployment/docker-compose.md)
@@ -110,7 +110,7 @@ Two things nothing configures for you, on either path:
   loop calling `/api/system/tick` once a minute, since `@meith/web`'s own
   worker package is not something a board outside the meith monorepo can
   depend on yet. Deploy some other way and something still has to call that
-  route (or run `community task:run`) every minute, or nothing catches up
+  route (or run `meith task:run`) every minute, or nothing catches up
   and nothing errors.
 
 ## Local
@@ -128,8 +128,8 @@ Posting needs Postgres. Copy `.env.example` to `.env.local`, set
 `DATABASE_URL` and the two secrets in it, then:
 
 ```sh
-npm run community -- migrate
-echo "<password>" | npm run community -- user:create --username <name> --email <address> --group administrators
+npm run meith -- migrate
+echo "<password>" | npm run meith -- user:create --username <name> --email <address> --group administrators
 ```
 
 ## Configuring
@@ -140,8 +140,50 @@ echo "<password>" | npm run community -- user:create --username <name> --email <
 - **`/admin`** — settings, forums, groups, members, themes, maintenance. An
   administrator re-enters their password to get in, and again for anything
   destructive.
-- **`npm run community -- --help`** — the operator CLI. Everything the panel does
+- **`npm run meith -- --help`** — the operator CLI. Everything the panel does
   and a few things it cannot, without a browser.
+
+## Installing plugins and themes
+
+Nothing installs into a running container — a plugin or theme has to be
+built into the image, the same as any other dependency:
+
+1. **In this repository**, install it:
+
+   ```sh
+   npm install --save-exact @meith/plugin-dues
+   ```
+
+   (a theme is the same command with its own package, e.g.
+   `@meith/theme-midnight`).
+
+2. **Register it.** A **theme** goes in `meith.config.ts`, in the `themes`
+   map, following the shape of the `default` entry already there. A
+   **plugin** goes in `meith.plugins.ts`: import its `plugin` and
+   `messages` exports and add `{ key, enabled: true, plugin, messages }`
+   to `INSTALLED_PLUGINS` — or run
+
+   ```sh
+   npm run meith -- plugin:add @meith/plugin-dues
+   ```
+
+   which edits `board.plugins.json` and regenerates `meith.plugins.ts`
+   for you.
+
+3. **Commit and push**, then **Redeploy** from Coolify — pushing alone does
+   not rebuild. Quick start builds the new image on that redeploy; advanced/prebuilt
+   waits for `.github/workflows/build.yml` to finish first, and Redeploy is
+   what actually pulls the result.
+
+4. **Once it is up, run its migrations one time:**
+
+   ```sh
+   docker compose run --rm web meith upgrade
+   ```
+
+See [docs/customization/plugins.md](https://github.com/meith-dev/meith/blob/main/docs/customization/plugins.md)
+and [docs/customization/themes.md](https://github.com/meith-dev/meith/blob/main/docs/customization/themes.md)
+for the full reference.
 
 ## Upgrading
 
@@ -183,7 +225,7 @@ project's own `.npmrc` sets `save-exact=true` for the same reason, so an
 `npm install` of anything else here — a plugin, say — stays pinned too; the
 build workflow also refuses to build from anything but an exact version, as
 a second line of defense. Once the rebuilt image is deployed, run
-`npm run community -- upgrade` against it for the plugin migrations — see
+`npm run meith -- upgrade` against it for the plugin migrations — see
 [the operator CLI](https://github.com/meith-dev/meith/blob/main/docs/guides/operations/operating.md#the-operator-cli)
 for running it against this deployment.
 

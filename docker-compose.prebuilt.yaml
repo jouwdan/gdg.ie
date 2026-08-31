@@ -1,4 +1,4 @@
-# meith-board, deployed by Coolify from a prebuilt image — the advanced path: point
+# gdg.ie, deployed by Coolify from a prebuilt image — the advanced path: point
 # Coolify's compose-file at this file instead of docker-compose.yaml once
 # `.github/workflows/build.yml` has pushed an image, and set MEITH_IMAGE to
 # what its Summary printed. This trades the quick-start's heavier
@@ -37,13 +37,13 @@ services:
   # Runs to completion, then exits. web waits for it, so the schema is
   # always applied before the first request rather than racing it.
   migrate:
-    image: ${MEITH_IMAGE:?set this to the image the build workflow's Summary just printed, e.g. ghcr.io/<you>/meith-board:latest}
+    image: ${MEITH_IMAGE:?set this to the image the build workflow's Summary just printed, e.g. ghcr.io/<you>/gdg.ie:latest}
     # Pull the tag on every deploy. Compose keeps an image it already has, so
     # a rebuilt `:latest` is otherwise never fetched and a redeploy quietly
     # runs the old code.
     pull_policy: always
     environment:
-      COMMUNITY_ROLE: migrate
+      MEITH_ROLE: migrate
       DATABASE_URL: postgres://community:$SERVICE_PASSWORD_POSTGRES@postgres:5432/community
       AUTH_SECRET: $SERVICE_BASE64_64_AUTH
       TICK_SECRET: $SERVICE_BASE64_64_TICK
@@ -53,7 +53,7 @@ services:
     restart: 'no'
 
   web:
-    image: ${MEITH_IMAGE:?set this to the image the build workflow's Summary just printed, e.g. ghcr.io/<you>/meith-board:latest}
+    image: ${MEITH_IMAGE:?set this to the image the build workflow's Summary just printed, e.g. ghcr.io/<you>/gdg.ie:latest}
     pull_policy: always
     restart: unless-stopped
     mem_limit: ${WEB_MEM_LIMIT:-1g}

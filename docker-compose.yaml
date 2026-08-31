@@ -1,4 +1,4 @@
-# meith-board, quick-start deployed by Coolify — the same shape as the meith
+# gdg.ie, quick-start deployed by Coolify — the same shape as the meith
 # repository's own docker/compose.coolify.yml: db, migrate, web, worker. See
 # README.md for the deploy story this file is the last step of.
 #
@@ -35,9 +35,9 @@ services:
   # always applied before the first request rather than racing it.
   migrate:
     build: .
-    image: meith-board
+    image: gdg.ie
     environment:
-      COMMUNITY_ROLE: migrate
+      MEITH_ROLE: migrate
       DATABASE_URL: postgres://community:$SERVICE_PASSWORD_POSTGRES@postgres:5432/community
       AUTH_SECRET: $SERVICE_BASE64_64_AUTH
       TICK_SECRET: $SERVICE_BASE64_64_TICK
@@ -48,7 +48,7 @@ services:
 
   web:
     build: .
-    image: meith-board
+    image: gdg.ie
     restart: unless-stopped
     mem_limit: ${WEB_MEM_LIMIT:-1g}
     cpus: ${WEB_CPUS:-2}
